@@ -12,10 +12,10 @@ defmodule Forklift do
     end
   end
 
-  defmacro plugin(mod) do
+  defmacro plugin(mod, opts \\ []) do
     quote do
       require unquote(mod)
-      unquote(mod).generate(store: @store, cache: @cache)
+      unquote(mod).generate(Keyword.merge([store: @store, cache: @cache], unquote(opts)))
     end
   end
 
