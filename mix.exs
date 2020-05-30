@@ -14,7 +14,7 @@ defmodule Forklift.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :crypto]
     ]
   end
 
@@ -22,7 +22,9 @@ defmodule Forklift.MixProject do
   defp deps do
     [
       {:depot, "~> 0.2.2"},
-      {:ecto, "~> 3.0"}
+      {:ecto, "~> 3.0"},
+      {:jason, "~> 1.2", optional: true},
+      {:plug, "~> 1.10", optional: true}
     ]
   end
 end
