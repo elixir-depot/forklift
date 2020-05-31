@@ -24,9 +24,16 @@ defmodule Forklift do
   def attachment_from_upload(file, opts) do
     filesystem = opts |> Keyword.fetch!(:cache) |> filesystem()
     contents = File.read!(file.path)
+    IO.inspect(filesystem)
 
-    case Depot.write(filesystem, file.filename, contents) do
-      :ok -> %Attachment{id: file.filename}
+    filename =
+      case Keyword.get(opts, :prefix) do
+        nil -> file.filename
+        prefix -> Path.join(prefix, file.filename)
+      end
+
+    case Depot.write(filesystem, filename, contents) do
+      :ok -> %Attachment{id: filename}
       _ -> %Attachment{id: nil}
     end
   end

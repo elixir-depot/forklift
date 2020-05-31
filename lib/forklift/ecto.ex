@@ -1,5 +1,5 @@
 defmodule Forklift.Ecto do
-  def generate(opts) do
+  defmacro generate(opts) do
     quote do
       use Ecto.Type
       alias Forklift.Attachment
@@ -7,7 +7,7 @@ defmodule Forklift.Ecto do
       defdelegate validate_cache_filled(changeset, field, opts \\ []), to: Forklift.Ecto
       def embed_as(_), do: :dump
       def type, do: :map
-      def cast(value), do: Forklift.Ecto.cast(value, cache: unquote(opts[:cache]))
+      def cast(value), do: Forklift.Ecto.cast(value, unquote(opts))
       def dump(value), do: Forklift.Ecto.dump(value)
       def load(value), do: Forklift.Ecto.load(value)
     end
