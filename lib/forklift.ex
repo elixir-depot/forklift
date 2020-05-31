@@ -9,6 +9,7 @@ defmodule Forklift do
   defmacro __using__(opts) do
     quote do
       import Forklift
+      import Forklift.Plugin, only: [plugin: 1, plugin: 2]
 
       @storages Map.new(unquote(Keyword.fetch!(opts, :storages)))
 

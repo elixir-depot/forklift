@@ -7,6 +7,8 @@ defmodule ForkliftTest do
       storages: [
         memory: Forklift.Storage.Memory
       ]
+
+    plugin Forklift.Telemetry
   end
 
   def create_plug_upload do
