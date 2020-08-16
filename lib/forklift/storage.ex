@@ -1,12 +1,13 @@
 defmodule Forklift.Storage do
-  @type t :: struct
+  @type t :: {module(), term}
+  @type liftable :: Forklift.Liftable.t()
 
   @callback new(opts :: Keyword.t()) :: storage :: t
 
   @callback upload(
               storage :: t,
               io :: Forklift.IO.t(),
-              id :: String.t(),
+              id :: liftable,
               opts :: Keyword.t()
             ) :: :ok | {:error, any}
 
@@ -23,39 +24,31 @@ defmodule Forklift.Storage do
 
   @callback clear(storage :: t) :: :ok | {:error, any}
 
-  def upload(%module{} = storage, id, io, opts \\ []) do
+  def upload({module, _} = storage, id, io, opts \\ []) do
     module.upload(storage, id, io, opts)
   end
 
-  def download(%module{} = storage, id, opts \\ []) do
+  def download({module, _} = storage, id, opts \\ []) do
     module.download(storage, id, opts)
   end
 
-  def exists?(%module{} = storage, id) do
+  def exists?({module, _} = storage, id) do
     module.exists?(storage, id)
   end
 
-  def url(%module{} = storage, id) do
+  def url({module, _} = storage, id) do
     module.url(storage, id)
   end
 
-  def delete(%module{} = storage, id) do
+  def delete({module, _} = storage, id) do
     module.delete(storage, id)
   end
 
-  def delete_prefixed(%module{} = storage, prefix) do
+  def delete_prefixed({module, _} = storage, prefix) do
     module.delete_prefixed(storage, prefix)
   end
 
-  def clear(%module{} = storage) do
+  def clear({module, _} = storage) do
     module.clear(storage)
-  end
-
-  defmacro __using__(_opts) do
-    quote do
-      @behaviour Forklift.Storage
-
-      alias Forklift.Storage
-    end
   end
 end

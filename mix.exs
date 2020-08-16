@@ -21,8 +21,10 @@ defmodule Forklift.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:depot, "~> 0.2.2"},
       {:ecto, "~> 3.0"},
+      {:mime, "~> 1.0"},
+      {:depot, "~> 0.3.0"},
+      {:depot_s3, "~> 0.1.2", optional: true},
       {:jason, "~> 1.2", optional: true},
       {:plug, "~> 1.10", optional: true}
     ]
