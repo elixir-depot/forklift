@@ -23,8 +23,7 @@ defmodule Forklift.MixProject do
     [
       {:ecto, "~> 3.0"},
       {:mime, "~> 1.0"},
-      {:depot, "~> 0.3.0"},
-      {:depot_s3, "~> 0.1.2", optional: true},
+      {:depot, "~> 0.5.0"},
       {:jason, "~> 1.2", optional: true},
       {:plug, "~> 1.10", optional: true}
     ]

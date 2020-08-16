@@ -1,15 +1,18 @@
 defmodule Forklift.Storage.MemoryTest do
   use ExUnit.Case
+  import Forklift.TestHelpers
 
   alias Forklift.Storage
   alias Forklift.Storage.Memory
 
   setup_all do
-    [io: ForkliftTest.create_plug_upload()]
+    [io: create_plug_upload()]
   end
 
   setup do
-    [storage: Memory.new()]
+    storage = Memory.new(name: Forklift.Storage.MemoryTest)
+    start_supervised!(storage)
+    [storage: storage]
   end
 
   test "upload", %{storage: storage, io: io} do
@@ -40,12 +43,12 @@ defmodule Forklift.Storage.MemoryTest do
   end
 
   test "delete_prefixed", %{storage: storage, io: io} do
-    Storage.upload(storage, "foo.txt", io)
-    Storage.upload(storage, "foo.png", io)
+    Storage.upload(storage, "foo/foo.txt", io)
+    Storage.upload(storage, "foo/foo.png", io)
 
-    assert :ok = Storage.delete_prefixed(storage, "foo")
-    refute Storage.exists?(storage, "foo.txt")
-    refute Storage.exists?(storage, "foo.png")
+    assert :ok = Storage.delete_prefixed(storage, "foo/")
+    refute Storage.exists?(storage, "foo/foo.txt")
+    refute Storage.exists?(storage, "foo/foo.png")
   end
 
   test "clear", %{storage: storage, io: io} do

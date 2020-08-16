@@ -34,42 +34,49 @@ defmodule Forklift.Storage.Depot do
       @behaviour Forklift.Storage
       @adapter unquote(adapter)
 
+      if @adapter.starts_processes() do
+        def child_spec(config) do
+          Supervisor.child_spec({@adapter, config}, %{})
+        end
+      end
+
       @impl Forklift.Storage
       def new(opts) do
-        @adapter.configure(opts)
+        {@adapter, config} = @adapter.configure(opts)
+        {__MODULE__, config}
       end
 
       @impl Forklift.Storage
-      def upload(filesystem, id, liftable, opts) do
-        Depot.write(filesystem, id, Forklift.Liftable.to_iodata(liftable), opts)
+      def upload({_storage, config}, id, liftable, opts) do
+        Depot.write({@adapter, config}, id, Forklift.Liftable.to_iodata(liftable), opts)
       end
 
       @impl Forklift.Storage
-      def download(filesystem, id, opts) do
-        Depot.read(filesystem, id, opts)
+      def download({_storage, config}, id, opts) do
+        Depot.read({@adapter, config}, id, opts)
       end
 
       @impl Forklift.Storage
-      def exists?(filesystem, id) do
-        case Depot.file_exists(filesystem, id) do
+      def exists?({_storage, config}, id) do
+        case Depot.file_exists({@adapter, config}, id) do
           {:ok, :exists} -> true
           {:ok, :missing} -> false
         end
       end
 
       @impl Forklift.Storage
-      def delete(filesystem, id) do
-        Depot.delete(filesystem, id)
+      def delete({_storage, config}, id) do
+        Depot.delete({@adapter, config}, id)
       end
 
       @impl Forklift.Storage
-      def delete_prefixed(filesystem, prefix) do
-        raise "Decide in :depot how to handle this."
+      def delete_prefixed({_storage, config}, prefix) do
+        Depot.delete_directory({@adapter, config}, prefix, recursive: true)
       end
 
       @impl Forklift.Storage
-      def clear(filesystem) do
-        raise "Decide in :depot how to handle this."
+      def clear({_storage, config}) do
+        Depot.clear({@adapter, config})
       end
     end
   end
