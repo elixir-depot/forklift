@@ -6,6 +6,8 @@ defmodule ForkliftTest do
   defmodule MemoryUploader do
     use Forklift
 
+    plugin(Forklift.Plugin.Store, cache: :memory, store: :store)
+
     def storages do
       %{
         memory: {Forklift.Storage.Memory, name: ForkliftTest.Uploader},
@@ -33,13 +35,14 @@ defmodule ForkliftTest do
     assert contents == File.read!(io.path)
   end
 
-  @tag :skip
-  test "copy", %{uploader: source, io: io} do
-    {:ok, original} = MemoryUploader.upload(source, io)
+  test "copy", %{io: io} do
+    {:ok, original} = MemoryUploader.upload(:memory, io)
 
-    destination = MemoryUploader.new(:memory)
-    assert {:ok, copy} = MemoryUploader.upload(destination, original)
+    assert {:ok, copy} = MemoryUploader.store(original)
     assert original.id != copy.id
     assert original.metadata == copy.metadata
+
+    assert {:ok, contents} = MemoryUploader.download(:store, copy.id)
+    assert contents == File.read!(io.path)
   end
 end

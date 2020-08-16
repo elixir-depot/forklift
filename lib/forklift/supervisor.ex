@@ -18,7 +18,7 @@ defmodule Forklift.Supervisor do
     children =
       for {key, storage} <- storages,
           Forklift.Storage.starts_processes(storage),
-          do: storage
+          do: Supervisor.child_spec(storage, id: storage)
 
     if children == [] do
       :ignore

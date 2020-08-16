@@ -1,7 +1,7 @@
 defprotocol Forklift.Liftable do
   @type t :: term()
 
-  @spec to_iodata(t) :: iodata()
+  @spec to_iodata(t) :: iodata() | false
   def to_iodata(data)
 
   @spec extension(t) :: String.t()
@@ -14,6 +14,12 @@ defimpl Forklift.Liftable, for: Tuple do
 
   def extension({:binary, binary}), do: ""
   def extension({:file, path}), do: Path.extname(path)
+end
+
+defimpl Forklift.Liftable, for: Forklift.File do
+  def to_iodata(_), do: false
+
+  def extension(%Forklift.File{id: id}), do: Path.extname(id)
 end
 
 if Code.ensure_loaded?(Plug.Upload) do

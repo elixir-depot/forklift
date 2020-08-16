@@ -10,6 +10,7 @@ defmodule Forklift do
 
   defmacro __using__(_opts) do
     quote do
+      import Forklift.Plugin, only: [plugin: 1, plugin: 2]
       @behaviour Forklift
 
       def child_spec(init_arg) do
@@ -25,7 +26,7 @@ defmodule Forklift do
         Forklift.Supervisor.start_link(__MODULE__, init_arg)
       end
 
-      def fetch_storage(key) do
+      defp fetch_storage(key) do
         {__MODULE__, :storages}
         |> :persistent_term.get(%{})
         |> Map.fetch(key)
@@ -106,5 +107,11 @@ defmodule Forklift do
 
   def download(storage, id, opts) do
     Forklift.Storage.download(storage, id, opts)
+  end
+
+  @async_driver Application.compile_env(:forklift, :async_driver, Forklift.Async.Task)
+
+  def async(fun) when is_function(fun, 0) do
+    @async_driver.run(fun)
   end
 end

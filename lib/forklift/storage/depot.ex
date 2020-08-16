@@ -34,6 +34,10 @@ defmodule Forklift.Storage.Depot do
       @behaviour Forklift.Storage
       @adapter unquote(adapter)
 
+      def __depot__({_storage, config}) do
+        {@adapter, config}
+      end
+
       if @adapter.starts_processes() do
         def child_spec(config) do
           Supervisor.child_spec({@adapter, config}, %{})
