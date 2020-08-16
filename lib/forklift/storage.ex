@@ -2,6 +2,8 @@ defmodule Forklift.Storage do
   @type t :: {module(), term}
   @type liftable :: Forklift.Liftable.t()
 
+  @callback starts_processes() :: boolean
+
   @callback new(opts :: Keyword.t()) :: storage :: t
 
   @callback upload(
@@ -23,6 +25,18 @@ defmodule Forklift.Storage do
   @callback delete_prefixed(storage :: t, prefix :: String.t()) :: :ok | {:error, any}
 
   @callback clear(storage :: t) :: :ok | {:error, any}
+
+  def starts_processes({module, _} = storage) do
+    module.starts_processes()
+  end
+
+  def new({module, opts}) do
+    module.new(opts)
+  end
+
+  def new(module) do
+    module.new([])
+  end
 
   def upload({module, _} = storage, id, io, opts \\ []) do
     module.upload(storage, id, io, opts)

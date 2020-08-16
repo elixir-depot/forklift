@@ -41,6 +41,11 @@ defmodule Forklift.Storage.Depot do
       end
 
       @impl Forklift.Storage
+      def starts_processes() do
+        @adapter.starts_processes()
+      end
+
+      @impl Forklift.Storage
       def new(opts) do
         {@adapter, config} = @adapter.configure(opts)
         {__MODULE__, config}

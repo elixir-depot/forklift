@@ -4,29 +4,32 @@ defmodule ForkliftTest do
   doctest Forklift
 
   defmodule MemoryUploader do
-    use Forklift,
-      storages: [
-        memory: {Forklift.Storage.Memory, name: ForkliftTest.Uploader}
-      ]
+    use Forklift
+
+    def storages do
+      %{
+        memory: {Forklift.Storage.Memory, name: ForkliftTest.Uploader},
+        store: {Forklift.Storage.Memory, name: ForkliftTest.Uploader2}
+      }
+    end
   end
 
   setup do
-    uploader = MemoryUploader.new(:memory)
-    start_supervised!(uploader.storage)
-    [uploader: uploader, io: create_plug_upload()]
+    start_supervised!(MemoryUploader)
+    [io: create_plug_upload()]
   end
 
-  test "upload", %{uploader: uploader, io: io} do
-    assert {:ok, %Forklift.File{} = file} = MemoryUploader.upload(uploader, io)
+  test "upload", %{io: io} do
+    assert {:ok, %Forklift.File{} = file} = MemoryUploader.upload(:memory, io)
     assert file.id
     assert file.storage_key == :memory
     assert file.metadata
   end
 
-  test "download", %{uploader: uploader, io: io} do
-    {:ok, file} = MemoryUploader.upload(uploader, io)
+  test "download", %{io: io} do
+    {:ok, file} = MemoryUploader.upload(:memory, io)
 
-    assert {:ok, contents} = MemoryUploader.download(uploader, file.id)
+    assert {:ok, contents} = MemoryUploader.download(:memory, file.id)
     assert contents == File.read!(io.path)
   end
 
