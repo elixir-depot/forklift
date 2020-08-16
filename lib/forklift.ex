@@ -73,18 +73,10 @@ defmodule Forklift do
     end
   end
 
-  defp get_metadata(%Forklift.File{metadata: metadata}, opts) do
-    Map.merge(metadata, Keyword.get(opts, :metadata, %{}))
-  end
-
-  defp get_metadata(%Plug.Upload{} = file, opts) do
-    metadata = %{
-      "filename" => file.filename,
-      "size" => File.stat!(file.path).size,
-      "mime_type" => file.content_type
-    }
-
-    Map.merge(metadata, Keyword.get(opts, :metadata, %{}))
+  defp get_metadata(input, opts) do
+    input
+    |> Forklift.Liftable.metadata()
+    |> Map.merge(Keyword.get(opts, :metadata, %{}))
   end
 
   def basic_location(input, opts) do
